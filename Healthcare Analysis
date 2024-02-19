@@ -1,0 +1,7 @@
+-- For this project I will be using SQL with MySQL to explore clinical data and provide insights regarding patient care and quality. 
+-- This data set was provided by Mark Connolly as part of the SQL for Healthcare Udemy course. The dataset contains 15 tables and spans over 100 years (1912-2020).
+-- For this project I will only be focusing on data from the years 2018-2019 across several different tables.
+-- I first created the schema and tables and then imported the data into MySQL.
+-- I utilized several functions to analyze this project including CTE, JOIN, CASE, HAVING, DISTINCT, ROUND and subqueries.
+
+  
