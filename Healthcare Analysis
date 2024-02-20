@@ -1,7 +1,45 @@
 -- For this project I will be using SQL with MySQL to explore clinical data and provide insights regarding patient care and quality. 
--- This data set was provided by Mark Connolly as part of the SQL for Healthcare Udemy course. The dataset contains 15 tables and spans over 100 years (1912-2020).
+-- This data set was provided by Mark Connolly as part of the SQL for Healthcare Udemy course. The data set contains 15 tables and spans over 100 years (1912-2020).
 -- For this project I will only be focusing on data from the years 2018-2019 across several different tables.
--- I first created the schema and tables and then imported the data into MySQL.
+-- I first created the schema and tables and then imported the data in MySQL.
 -- I utilized several functions to analyze this project including CTE, JOIN, CASE, HAVING, DISTINCT, ROUND and subqueries.
 
-  
+-- Lets start by looking at the average ER visit duration.
+-- The average time spent a patient spent in the ER was 81.47 minutes or around 1.4 hours.
+SELECT 
+Round(AVG(THROUGHPUT_IN_MIN), 2) AS THR_AVG_IN_MIN
+FROM (
+				    SELECT *,
+				TIMESTAMPDIFF(MINUTE,START,STOP) THROUGHPUT_IN_MIN
+				FROM HEALTHCARE.ENCOUNTERS 
+				WHERE START>='2019-01-01'
+				AND START<'2020-01-01'
+				AND ENCOUNTERCLASS='EMERGENCY'
+			) THROUGHPUT;
+                      
+-- Next, we'll look at whether the hospital treats patients differntly based on race, specifically in regards to the average number of procedures. 
+-- It appears that the average number of procedures of white and asian patients were consistent at around 1.7 but the average number procedures for African Americans were a bit higher at 2.5. 
+-- This is worth exploring furhter to see what factors may have contributed to a higher average of African Americans having received more procedures than any other race.          
+select x.race, (x.num_of_procedures/y.num_of_patients) as average_num_of_proc_by_race
+from                 
+(SELECT PT.RACE, COUNT(*) as num_of_procedures           
+FROM HEALTHCARE.PATIENTS PT
+JOIN HEALTHCARE.ENCOUNTERS ENC
+ON ENC.PATIENT = PT.ID
+JOIN HEALTHCARE.PROCEDURES PROC
+ON ENC.ID = PROC.ENCOUNTER
+WHERE ENC.START>='2019-01-01'
+				AND ENC.START<'2020-01-01'
+				AND ENC.ENCOUNTERCLASS='EMERGENCY' 
+                GROUP BY PT.RACE) x
+left join                
+(SELECT PT.RACE, COUNT(distinct proc.patient) as num_of_patients       
+FROM HEALTHCARE.PATIENTS PT
+JOIN HEALTHCARE.ENCOUNTERS ENC
+ON ENC.PATIENT = PT.ID
+JOIN HEALTHCARE.PROCEDURES PROC
+ON ENC.ID = PROC.ENCOUNTER
+WHERE ENC.START>='2019-01-01'
+				AND ENC.START<'2020-01-01'
+				AND ENC.ENCOUNTERCLASS='EMERGENCY' 
+                GROUP BY PT.RACE) y on x.race = y.race;  
