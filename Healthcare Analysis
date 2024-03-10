@@ -6,16 +6,18 @@
 
 -- Lets start by looking at the average ER visit duration.
 -- The average time spent a patient spent in the ER was 81.47 minutes or around 1.4 hours.
-SELECT 
-Round(AVG(THROUGHPUT_IN_MIN), 2) AS THR_AVG_IN_MIN
-FROM (
+
+WITH Throughput AS (
 				    SELECT *,
-				TIMESTAMPDIFF(MINUTE,START,STOP) THROUGHPUT_IN_MIN
-				FROM HEALTHCARE.ENCOUNTERS 
-				WHERE START>='2019-01-01'
-				AND START<'2020-01-01'
-				AND ENCOUNTERCLASS='EMERGENCY'
-			) THROUGHPUT;
+				TIMESTAMPDIFF(MINUTE,START,STOP) Throughput_In_Min
+				FROM healthcare.encounters
+				WHERE start>='2019-01-01'
+				AND start<'2020-01-01'
+				AND encounterclass='emergency'
+			)  
+SELECT 
+Round(AVG(Throughput_In_Min), 2) AS Thr_Avg_In_Min
+FROM Throughput;
                       
 -- Next, we'll look at whether the hospital treats patients differntly based on race, specifically in regards to the average number of procedures. 
 -- It appears that the average number of procedures of white and asian patients were consistent at around 1.7 but the average number procedures for African Americans were a bit higher at 2.5. 
